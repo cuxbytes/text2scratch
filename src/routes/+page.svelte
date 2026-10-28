@@ -2,8 +2,8 @@
 	import Editor from '#lib/components/Editor.svelte';
 	import DocxFlow from '#lib/components/DocxFlow.svelte';
 	import { i18n } from '#lib/i18n.svelte.ts';
-	// version shown in the footer always matches the installed package
-	import { version as sbVersion } from 'scratchblocks/package.json';
+	// footer shows the app's own version from package.json
+	import { version } from '../../package.json';
 
 	type Tab = 'editor' | 'word';
 	const tabs: { id: Tab; tone: string; label: 'tabEditor' | 'tabWord' }[] = [
@@ -79,7 +79,7 @@
 
 	<footer class="foot">
 		<span>{t.footer}</span>
-		<span class="label">scratchblocks {sbVersion} · JSZip</span>
+		<span class="label">text2scratch v{version}</span>
 	</footer>
 </div>
 
