@@ -37,7 +37,7 @@
 		display: inline-block;
 	}
 	.err {
-		color: var(--pen);
+		color: var(--danger);
 		font-family: var(--font-mono);
 		font-size: 0.8rem;
 	}

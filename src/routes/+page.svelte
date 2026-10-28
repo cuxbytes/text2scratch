@@ -3,8 +3,24 @@
 	import DocxFlow from '#lib/components/DocxFlow.svelte';
 	import { i18n } from '#lib/i18n.svelte.ts';
 
-	let tab = $state<'editor' | 'word'>('editor');
+	type Tab = 'editor' | 'word';
+	const tabs: { id: Tab; tone: string; label: 'tabEditor' | 'tabWord' }[] = [
+		{ id: 'editor', tone: 'motion', label: 'tabEditor' },
+		{ id: 'word', tone: 'control', label: 'tabWord' }
+	];
+
+	let tab = $state<Tab>('editor');
 	const t = $derived(i18n.t);
+
+	// Arrow keys move between tabs (WAI-ARIA tabs pattern, automatic activation)
+	function onTabKey(e: KeyboardEvent) {
+		const i = tabs.findIndex((x) => x.id === tab);
+		const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+		if (next === undefined) return;
+		e.preventDefault();
+		tab = tabs[(next + tabs.length) % tabs.length].id;
+		document.getElementById(`tab-${tab}`)?.focus();
+	}
 </script>
 
 <svelte:head>
@@ -15,7 +31,10 @@
 <div class="wrap">
 	<header class="top">
 		<div class="brand">
-			<h1>text<span class="arrow">→</span><em>scratch</em></h1>
+			<h1>
+				<span class="w-text">text</span><span class="sr">2</span><span class="w-block" aria-hidden="true">scratch</span
+				><span class="sr">scratch</span>
+			</h1>
 			<p class="tagline">{t.tagline}</p>
 		</div>
 		<div class="lang" role="group" aria-label={t.blockLang}>
@@ -30,21 +49,31 @@
 		</div>
 	</header>
 
-	<div class="tabs" role="tablist">
-		<button role="tab" aria-selected={tab === 'editor'} class:on={tab === 'editor'} onclick={() => (tab = 'editor')}>
-			<span class="dot" style="background:#4c97ff"></span>{t.tabEditor}
-		</button>
-		<button role="tab" aria-selected={tab === 'word'} class:on={tab === 'word'} onclick={() => (tab = 'word')}>
-			<span class="dot" style="background:#ffab19"></span>{t.tabWord}
-		</button>
+	<div class="tabs" role="tablist" tabindex="-1" onkeydown={onTabKey}>
+		{#each tabs as x (x.id)}
+			<button
+				role="tab"
+				id="tab-{x.id}"
+				aria-selected={tab === x.id}
+				aria-controls="panel-{x.id}"
+				tabindex={tab === x.id ? 0 : -1}
+				class:on={tab === x.id}
+				style="--tone: var(--{x.tone}); --tone-edge: var(--{x.tone}-edge)"
+				onclick={() => (tab = x.id)}
+			>
+				{t[x.label]}
+			</button>
+		{/each}
 	</div>
 
 	<main>
-		{#if tab === 'editor'}
+		<!-- both panels stay mounted so switching tabs keeps the editor text and the loaded .docx -->
+		<div id="panel-editor" role="tabpanel" aria-labelledby="tab-editor" hidden={tab !== 'editor'}>
 			<Editor />
-		{:else}
+		</div>
+		<div id="panel-word" role="tabpanel" aria-labelledby="tab-word" hidden={tab !== 'word'}>
 			<DocxFlow />
-		{/if}
+		</div>
 	</main>
 
 	<footer class="foot">
@@ -55,13 +84,23 @@
 
 <style>
 	.wrap {
+		position: relative;
+		z-index: 1;
 		max-width: 1240px;
 		margin: 0 auto;
-		padding: 36px 24px 28px;
+		padding: 40px 24px 28px;
 		display: flex;
 		flex-direction: column;
-		gap: 22px;
+		gap: 24px;
 		min-height: 100vh;
+	}
+	.sr {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
 	}
 	.top {
 		display: flex;
@@ -69,48 +108,54 @@
 		align-items: flex-end;
 		gap: 20px;
 		flex-wrap: wrap;
-		animation: fade 0.5s both;
+		animation: snap 0.5s both cubic-bezier(0.2, 0.8, 0.2, 1.2);
 	}
 	h1 {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
 		font-family: var(--font-display);
-		font-weight: 700;
-		font-size: clamp(2.4rem, 7vw, 4.2rem);
-		line-height: 0.95;
-		letter-spacing: -0.03em;
+		font-weight: 800;
+		font-size: clamp(2.4rem, 7vw, 4.4rem);
+		font-variation-settings: 'opsz' 96;
+		line-height: 1;
+		letter-spacing: -0.04em;
 		margin: 0;
 	}
-	h1 em {
-		font-weight: 500;
-		font-style: italic;
-		color: var(--pen);
-	}
-	.arrow {
-		font-family: var(--font-body);
-		font-weight: 400;
-		color: var(--ink-3);
-		margin: 0 0.08em;
+	/* "scratch" set as a stack block snapping onto "text" */
+	.w-block {
+		margin-left: 0.12em;
+		padding: 0.02em 0.3em 0.1em;
+		background: var(--motion);
+		color: var(--on-tone);
+		border-radius: 0.14em;
+		box-shadow: inset 0 -0.07em 0 var(--motion-edge);
+		letter-spacing: -0.03em;
 	}
 	.tagline {
-		margin: 8px 0 0;
+		margin: 12px 0 0;
 		color: var(--ink-2);
-		font-size: 1.05rem;
+		font-size: 1.1rem;
+		font-weight: 500;
 	}
 	.lang {
 		display: flex;
 		align-items: center;
 		gap: 10px;
 	}
+	/* reporter-shaped segmented control */
 	.seg {
 		display: flex;
-		border: 1px solid var(--rule);
+		border: 1px solid var(--line);
 		border-radius: 999px;
-		background: var(--sheet);
+		background: var(--surface);
 		padding: 3px;
+		box-shadow: inset 0 -2px 0 var(--line);
 	}
 	.seg button {
 		border: 0;
 		background: none;
-		padding: 0.3em 0.9em;
+		padding: 0.3em 0.95em;
 		border-radius: 999px;
 		font-family: var(--font-mono);
 		font-size: 0.8rem;
@@ -118,41 +163,55 @@
 		color: var(--ink-3);
 	}
 	.seg button.on {
-		background: var(--ink);
-		color: var(--paper);
+		background: var(--operators);
+		color: var(--on-tone);
+		box-shadow: inset 0 -2px 0 var(--operators-edge);
 	}
 
+	/* hat-block tabs: dome on the left of the top edge */
 	.tabs {
 		display: flex;
-		gap: 4px;
-		border-bottom: 1px solid var(--rule);
-		animation: fade 0.5s 0.08s both;
+		gap: 12px;
+		padding-top: 14px;
+		animation: snap 0.5s 0.08s both cubic-bezier(0.2, 0.8, 0.2, 1.2);
 	}
 	.tabs button {
-		display: flex;
-		align-items: center;
-		gap: 8px;
+		position: relative;
 		border: 0;
-		background: none;
-		padding: 10px 16px 12px;
+		background: var(--surface);
+		color: var(--ink-2);
+		padding: 10px 22px 12px;
+		border-radius: 4px 10px 10px 10px;
 		font-size: 1rem;
-		font-weight: 500;
-		color: var(--ink-3);
-		border-bottom: 2.5px solid transparent;
+		font-weight: 650;
+		box-shadow: inset 0 -3px 0 var(--line);
+		transition:
+			transform 0.15s ease,
+			background 0.15s ease;
+	}
+	.tabs button::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		bottom: 100%;
+		width: 64px;
+		height: 12px;
 		margin-bottom: -1px;
+		background: inherit;
+		border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+	}
+	.tabs button:hover:not(.on) {
+		transform: translateY(-2px);
+		color: var(--ink);
 	}
 	.tabs button.on {
-		color: var(--ink);
-		border-bottom-color: var(--pen);
-	}
-	.dot {
-		width: 10px;
-		height: 10px;
-		border-radius: 3px;
+		background: var(--tone);
+		color: var(--on-tone);
+		box-shadow: inset 0 -3px 0 var(--tone-edge);
 	}
 	main {
 		flex: 1;
-		animation: fade 0.5s 0.16s both;
+		animation: snap 0.5s 0.16s both cubic-bezier(0.2, 0.8, 0.2, 1.2);
 	}
 	.foot {
 		display: flex;
@@ -162,19 +221,23 @@
 		font-size: 0.85rem;
 		color: var(--ink-3);
 		padding-top: 14px;
-		border-top: 1px dashed var(--rule);
+		border-top: 1px solid var(--line);
 	}
 
-	@keyframes fade {
+	@keyframes snap {
 		from {
 			opacity: 0;
-			transform: translateY(6px);
+			transform: translateY(10px) scale(0.99);
 		}
 	}
 
 	@media (max-width: 600px) {
 		.wrap {
 			padding: 24px 16px;
+		}
+		.tabs button {
+			flex: 1;
+			padding-inline: 12px;
 		}
 	}
 </style>

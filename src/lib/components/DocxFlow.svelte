@@ -14,6 +14,9 @@
 	let busy = $state(false);
 	let input = $state<HTMLInputElement>();
 
+	// cards cycle through the Scratch category colours
+	const tones = ['motion', 'looks', 'sound', 'events', 'control', 'sensing', 'operators', 'variables', 'myblocks'];
+
 	const t = $derived(i18n.t);
 	const step = $derived(scanned ? (items.length ? 3 : 2) : 1);
 
@@ -115,7 +118,10 @@
 				e.preventDefault();
 				dragging = true;
 			}}
-			ondragleave={() => (dragging = false)}
+			ondragleave={(e) => {
+				// moving onto a child also fires dragleave; only reset when leaving the zone
+				if (!e.currentTarget.contains(e.relatedTarget as Node | null)) dragging = false;
+			}}
 			ondrop={onDrop}
 		>
 			<div class="doc-icon" aria-hidden="true">
@@ -124,7 +130,7 @@
 			<h2>{t.drop}</h2>
 			<div class="drop-actions">
 				<button class="btn primary" onclick={() => input?.click()}>{t.dropOr}</button>
-				<button class="btn pen" onclick={loadDemo}>★ {t.demoDoc}</button>
+				<button class="btn accent" onclick={loadDemo}>★ {t.demoDoc}</button>
 			</div>
 			<p class="hint"><code>[[SB:a3_code]]</code> … <code>[[/SB]]</code> · {t.dropHint}</p>
 			{#if error}<p class="err">{error}</p>{/if}
@@ -139,7 +145,7 @@
 			<div class="actions">
 				<button class="btn" onclick={reset}>← {t.another}</button>
 				<button class="btn" onclick={exportZip} disabled={!items.length || busy}>↓ {t.allPng}</button>
-				<button class="btn pen" onclick={exportDocx} disabled={!items.length || busy}>
+				<button class="btn accent" onclick={exportDocx} disabled={!items.length || busy}>
 					↓ {busy ? t.building : t.build}
 				</button>
 			</div>
@@ -149,7 +155,7 @@
 
 		<div class="grid">
 			{#each items as it, i (it.id)}
-				<article class="card sheet" style="animation-delay: {i * 60}ms">
+				<article class="card sheet" style="--tone: var(--{tones[i % tones.length]}); animation-delay: {i * 60}ms">
 					<header>
 						<code class="tag">[[SB:{it.id}]]</code>
 						<div class="actions">
@@ -176,31 +182,46 @@
 
 <style>
 	.flow {
+		--tone: var(--control);
 		display: flex;
 		flex-direction: column;
 		gap: 20px;
 	}
+	/* steps as reporter pills joined by a connector */
 	.steps {
 		display: flex;
-		gap: 8px;
+		align-items: center;
 		list-style: none;
 		padding: 0;
 		margin: 0;
 		flex-wrap: wrap;
+		row-gap: 8px;
 	}
 	.steps li {
 		display: flex;
 		align-items: center;
 		gap: 8px;
+		padding: 4px 14px 4px 4px;
+		border-radius: 999px;
+		background: var(--surface);
+		border: 1px solid var(--line);
+		box-shadow: inset 0 -2px 0 var(--line);
 		font-size: 0.9rem;
+		font-weight: 600;
 		color: var(--ink-3);
-		padding-right: 18px;
 	}
-	.steps li:not(:last-child)::after {
+	.steps li + li {
+		position: relative;
+		margin-left: 20px;
+	}
+	.steps li + li::before {
 		content: '';
-		width: 28px;
-		border-top: 1px dashed var(--rule);
-		margin-left: 10px;
+		position: absolute;
+		left: -21px;
+		top: calc(50% - 1.5px);
+		width: 20px;
+		height: 3px;
+		background: var(--line);
 	}
 	.n {
 		display: grid;
@@ -208,22 +229,26 @@
 		width: 26px;
 		height: 26px;
 		border-radius: 50%;
-		border: 1.5px solid var(--rule);
+		background: var(--canvas-2);
 		font-family: var(--font-mono);
 		font-size: 0.78rem;
 	}
 	.steps li.active {
-		color: var(--ink);
-		font-weight: 500;
+		background: var(--control);
+		border-color: var(--control-edge);
+		box-shadow: inset 0 -2px 0 var(--control-edge);
+		color: var(--on-tone);
 	}
 	.steps li.active .n {
-		border-color: var(--pen);
-		color: var(--pen);
+		background: var(--surface);
+		color: var(--ink);
+	}
+	.steps li.done {
+		color: var(--ink);
 	}
 	.steps li.done .n {
-		background: var(--ok);
-		border-color: var(--ok);
-		color: var(--sheet);
+		background: var(--operators);
+		color: var(--on-tone);
 	}
 
 	.drop {
@@ -233,19 +258,34 @@
 		text-align: center;
 		gap: 14px;
 		padding: 56px 24px;
-		border: 2px dashed var(--rule);
-		transition:
-			border-color 0.15s,
-			transform 0.15s;
+		transition: transform 0.15s;
+	}
+	/* dashed inner mouth, like an empty C-block waiting for a script */
+	.drop::after {
+		content: '';
+		position: absolute;
+		inset: 14px;
+		border: 2px dashed var(--line);
+		border-radius: 8px;
+		pointer-events: none;
+		transition: border-color 0.15s;
 	}
 	.drop.dragging {
-		border-color: var(--pen);
 		transform: scale(1.01);
+	}
+	.drop.dragging::after {
+		border-color: var(--events-edge);
+		background: color-mix(in srgb, var(--events) 10%, transparent);
+	}
+	.drop > :global(*) {
+		position: relative;
+		z-index: 1;
 	}
 	.drop h2 {
 		font-family: var(--font-display);
-		font-weight: 500;
-		font-size: clamp(1.6rem, 4vw, 2.2rem);
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		font-size: clamp(1.6rem, 4vw, 2.3rem);
 		margin: 0;
 	}
 	.drop-actions {
@@ -264,14 +304,16 @@
 	.tag {
 		font-family: var(--font-mono);
 		font-size: 0.8rem;
-		color: var(--pen);
+		color: var(--ink-2);
+		font-weight: 500;
 	}
 	.err {
-		color: var(--pen);
+		color: var(--danger);
 	}
 	.doc-icon {
 		width: 64px;
 		height: 80px;
+		background: var(--surface);
 		border: 1.5px solid var(--ink-3);
 		border-radius: 6px;
 		padding: 14px 10px;
@@ -283,13 +325,14 @@
 	.doc-icon span {
 		height: 4px;
 		border-radius: 2px;
-		background: var(--rule);
+		background: var(--line);
 	}
 	.doc-icon .sb {
 		height: 14px;
 		width: 80%;
-		background: #ffab19;
+		background: var(--control);
 		border-radius: 3px;
+		box-shadow: inset 0 -2px 0 var(--control-edge);
 	}
 
 	.bar {
@@ -298,12 +341,13 @@
 		align-items: center;
 		gap: 14px;
 		flex-wrap: wrap;
-		padding: 14px 18px;
+		padding: 16px 18px 14px;
 	}
 	.fname {
 		font-family: var(--font-display);
 		font-size: 1.25rem;
-		font-weight: 500;
+		font-weight: 700;
+		letter-spacing: -0.02em;
 		margin-right: 12px;
 		word-break: break-all;
 	}
@@ -328,7 +372,7 @@
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
-		animation: rise 0.4s both cubic-bezier(0.2, 0.7, 0.2, 1);
+		animation: snap 0.45s both cubic-bezier(0.2, 0.8, 0.2, 1.25);
 	}
 	.card header {
 		display: flex;
@@ -336,13 +380,13 @@
 		align-items: center;
 		gap: 10px;
 		flex-wrap: wrap;
-		padding: 10px 12px 10px 16px;
-		border-bottom: 1px dashed var(--rule);
+		padding: 14px 12px 10px 16px;
+		border-bottom: 1px solid var(--line);
 	}
 	.card textarea {
 		border: 0;
-		border-bottom: 1px dashed var(--rule);
-		background: var(--paper-2);
+		border-bottom: 1px solid var(--line);
+		background: var(--canvas-2);
 		font-family: var(--font-mono);
 		font-size: 0.82rem;
 		line-height: 1.6;
@@ -351,12 +395,16 @@
 		white-space: pre;
 		outline: none;
 	}
+	.card textarea:focus-visible {
+		box-shadow: inset 3px 0 0 var(--tone);
+	}
 	.card .stage {
 		padding: 20px;
 		overflow: auto;
 		flex: 1;
-		background-image: radial-gradient(var(--rule) 1.2px, transparent 1.2px);
-		background-size: 18px 18px;
+		background-color: var(--canvas-2);
+		background-image: radial-gradient(var(--dot) 1.3px, transparent 1.3px);
+		background-size: 20px 20px;
 	}
 	/* shrink wide scripts to the card instead of clipping them */
 	.card .stage :global(.blocks-stage) {
@@ -368,18 +416,18 @@
 	}
 	.warn {
 		padding: 8px 16px;
-		background: var(--pen-soft);
+		background: var(--danger-soft);
 		font-size: 0.8rem;
 		font-family: var(--font-mono);
 	}
 	.warn .label {
-		color: var(--pen);
+		color: var(--danger);
 	}
 
-	@keyframes rise {
+	@keyframes snap {
 		from {
 			opacity: 0;
-			transform: translateY(10px);
+			transform: translateY(12px) scale(0.97);
 		}
 	}
 </style>

@@ -127,6 +127,12 @@
 		gap: 20px;
 		min-height: 560px;
 	}
+	.source {
+		--tone: var(--sensing);
+	}
+	.preview {
+		--tone: var(--operators);
+	}
 	.pane {
 		display: flex;
 		flex-direction: column;
@@ -139,8 +145,8 @@
 		justify-content: space-between;
 		gap: 12px;
 		flex-wrap: wrap;
-		padding: 12px 14px 12px 18px;
-		border-bottom: 1px dashed var(--rule);
+		padding: 14px 14px 12px 18px;
+		border-bottom: 1px solid var(--line);
 	}
 	.tools {
 		display: flex;
@@ -156,20 +162,13 @@
 	}
 	.zoom input {
 		width: 90px;
-		accent-color: var(--pen);
+		accent-color: var(--operators-edge);
 	}
-	select.btn {
-		appearance: none;
-		padding-right: 1.1em;
-	}
-
 	.code {
 		flex: 1;
 		display: flex;
 		min-height: 320px;
 		position: relative;
-		/* red margin line, like a school notebook */
-		background: linear-gradient(90deg, transparent 47px, var(--pen-soft) 47px, var(--pen-soft) 49px, transparent 49px);
 	}
 	.gutter {
 		width: 48px;
@@ -177,6 +176,8 @@
 		overflow: hidden;
 		padding: 16px 0;
 		text-align: right;
+		background: var(--canvas-2);
+		border-right: 2px solid color-mix(in srgb, var(--tone) 55%, transparent);
 		font-family: var(--font-mono);
 		font-size: 0.8rem;
 		line-height: 1.7rem;
@@ -202,7 +203,7 @@
 		tab-size: 3;
 	}
 	footer {
-		border-top: 1px dashed var(--rule);
+		border-top: 1px solid var(--line);
 		padding: 10px 18px;
 		font-size: 0.875rem;
 	}
@@ -210,15 +211,15 @@
 		background: none;
 		border: 0;
 		padding: 0;
-		color: var(--blue-ink);
-		font-weight: 500;
+		color: var(--link);
+		font-weight: 600;
 	}
 	.help {
 		margin: 8px 0 4px;
 		color: var(--ink-2);
 	}
 	.help a {
-		color: var(--blue-ink);
+		color: var(--link);
 		display: inline-block;
 		margin-top: 4px;
 	}
@@ -228,14 +229,15 @@
 		overflow: auto;
 		padding: 28px;
 		min-height: 320px;
-		background-image: radial-gradient(var(--rule) 1.2px, transparent 1.2px);
-		background-size: 18px 18px;
+		background-color: var(--canvas-2);
+		background-image: radial-gradient(var(--dot) 1.3px, transparent 1.3px);
+		background-size: 20px 20px;
 	}
 	.empty {
 		color: var(--ink-3);
-		font-family: var(--font-display);
-		font-style: italic;
-		font-size: 1.2rem;
+		font-size: 1.15rem;
+		font-weight: 500;
+		margin: 0;
 	}
 	.warn {
 		display: flex;
@@ -243,11 +245,11 @@
 		gap: 8px;
 		align-items: center;
 		padding: 10px 18px;
-		background: var(--pen-soft);
-		border-top: 1px solid var(--rule);
+		background: var(--danger-soft);
+		border-top: 1px solid var(--line);
 	}
 	.warn .label {
-		color: var(--pen);
+		color: var(--danger);
 	}
 	.warn code {
 		font-family: var(--font-mono);

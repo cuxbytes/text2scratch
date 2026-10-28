@@ -1,22 +1,42 @@
-/* Paper exam sheet in light mode, school blackboard in dark mode. */
+/* Scratch construction kit: cool workspace canvas, block category colours as accents. */
 :root {
-	--paper: #fbf8f1;
-	--paper-2: #f3eee2;
-	--sheet: #fffefb;
-	--ink: #1d1b16;
-	--ink-2: #5b564b;
-	--ink-3: #8f887a;
-	--rule: #e4dccb;
-	--grid: rgba(76, 151, 255, 0.09);
-	--grid-strong: rgba(76, 151, 255, 0.16);
-	--pen: #d0342c;
-	--pen-soft: rgba(208, 52, 44, 0.1);
-	--blue: #4c97ff;
-	--blue-ink: #2d6fd6;
-	--ok: #2f8f5b;
-	--shadow: 0 1px 0 rgba(29, 27, 22, 0.04), 0 10px 30px -12px rgba(29, 27, 22, 0.18);
-	--radius: 14px;
-	--font-display: 'Fraunces Variable', Georgia, serif;
+	/* Scratch 3 category colours (fill / edge) */
+	--motion: #4c97ff;
+	--motion-edge: #3373cc;
+	--looks: #9966ff;
+	--looks-edge: #774dcb;
+	--sound: #cf63cf;
+	--sound-edge: #bd42bd;
+	--events: #ffbf00;
+	--events-edge: #cc9900;
+	--control: #ffab19;
+	--control-edge: #cf8b17;
+	--sensing: #5cb1d6;
+	--sensing-edge: #2e8eb8;
+	--operators: #59c059;
+	--operators-edge: #389438;
+	--variables: #ff8c1a;
+	--variables-edge: #db6e00;
+	--myblocks: #ff6680;
+	--myblocks-edge: #ff3355;
+
+	--canvas: #f3f5fb;
+	--canvas-2: #e9ecf6;
+	--surface: #ffffff;
+	--ink: #1b1e33;
+	--ink-2: #4b5170;
+	--ink-3: #676e8d;
+	--line: #dce0ec;
+	--dot: rgba(27, 30, 51, 0.1);
+	--on-tone: #14172a;
+	--link: #2a62c4;
+	--danger: #d42f45;
+	--danger-soft: rgba(212, 47, 69, 0.09);
+	--chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23676e8d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	--shape-opacity: 0.16;
+	--shadow: 0 1px 2px rgba(27, 30, 51, 0.06), 0 12px 32px -16px rgba(27, 30, 51, 0.22);
+	--radius: 12px;
+	--font-display: 'Bricolage Grotesque Variable', 'Avenir Next', sans-serif;
 	--font-body: 'Bricolage Grotesque Variable', 'Avenir Next', sans-serif;
 	--font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 	color-scheme: light;
@@ -24,20 +44,20 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--paper: #18211c;
-		--paper-2: #1f2a24;
-		--sheet: #222e28;
-		--ink: #eef0e6;
-		--ink-2: #b6bdaf;
-		--ink-3: #7e8a7f;
-		--rule: #33433a;
-		--grid: rgba(238, 240, 230, 0.045);
-		--grid-strong: rgba(238, 240, 230, 0.08);
-		--pen: #ff7a6b;
-		--pen-soft: rgba(255, 122, 107, 0.14);
-		--blue-ink: #8bb9ff;
-		--ok: #6fd39a;
-		--shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 14px 34px -14px rgba(0, 0, 0, 0.6);
+		--canvas: #11131e;
+		--canvas-2: #181b29;
+		--surface: #1c2031;
+		--ink: #eef0fa;
+		--ink-2: #b4b9d2;
+		--ink-3: #858ba8;
+		--line: #2d3249;
+		--dot: rgba(238, 240, 250, 0.07);
+		--link: #8bb9ff;
+		--danger: #ff7286;
+		--danger-soft: rgba(255, 114, 134, 0.12);
+		--chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23858ba8' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+		--shape-opacity: 0.2;
+		--shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 36px -16px rgba(0, 0, 0, 0.7);
 		color-scheme: dark;
 	}
 }
@@ -55,18 +75,10 @@ body {
 }
 
 body {
-	background-color: var(--paper);
-	background-image:
-		linear-gradient(var(--grid-strong) 1px, transparent 1px),
-		linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px),
-		linear-gradient(var(--grid) 1px, transparent 1px),
-		linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-	background-size:
-		100px 100px,
-		100px 100px,
-		20px 20px,
-		20px 20px;
-	background-position: -1px -1px;
+	/* workspace dot grid, like the Scratch code area */
+	background-color: var(--canvas);
+	background-image: radial-gradient(var(--dot) 1.3px, transparent 1.3px);
+	background-size: 24px 24px;
 	color: var(--ink);
 	font-family: var(--font-body);
 	font-size: 16px;
@@ -87,30 +99,41 @@ button {
 }
 
 :focus-visible {
-	outline: 2px solid var(--blue);
+	outline: 2.5px solid var(--motion);
 	outline-offset: 2px;
 }
 
+/* Buttons are chunky like blocks: solid fill, darker bottom edge, press sinks in */
 .btn {
+	--b-bg: var(--surface);
+	--b-edge: var(--line);
+	--b-fg: var(--ink);
 	display: inline-flex;
 	align-items: center;
 	gap: 0.45em;
-	border: 1px solid var(--rule);
-	background: var(--sheet);
-	padding: 0.45em 0.85em;
-	border-radius: 999px;
+	border: 1px solid var(--b-edge);
+	background: var(--b-bg);
+	color: var(--b-fg);
+	padding: 0.5em 0.95em 0.58em;
+	border-radius: 10px;
+	box-shadow: inset 0 -3px 0 var(--b-edge);
 	font-size: 0.875rem;
-	font-weight: 500;
+	font-weight: 600;
 	white-space: nowrap;
 	transition:
-		transform 0.12s ease,
-		border-color 0.12s ease,
-		background 0.12s ease;
+		transform 0.1s ease,
+		box-shadow 0.1s ease,
+		filter 0.12s ease;
 }
 
 .btn:hover:not(:disabled) {
-	border-color: var(--ink-3);
+	filter: brightness(1.04);
 	transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+	transform: translateY(1px);
+	box-shadow: inset 0 -1px 0 var(--b-edge);
 }
 
 .btn:disabled {
@@ -119,33 +142,58 @@ button {
 }
 
 .btn.primary {
-	background: var(--ink);
-	color: var(--paper);
-	border-color: var(--ink);
+	--b-bg: var(--ink);
+	--b-edge: color-mix(in srgb, var(--ink) 60%, #000);
+	--b-fg: var(--canvas);
 }
 
-.btn.pen {
-	background: var(--pen);
-	color: #fff;
-	border-color: var(--pen);
+.btn.accent {
+	--b-bg: var(--control);
+	--b-edge: var(--control-edge);
+	--b-fg: var(--on-tone);
 }
 
+select.btn {
+	appearance: none;
+	padding-right: 2.1em;
+	background-image: var(--chevron);
+	background-repeat: no-repeat;
+	background-position: right 0.8em center;
+	background-size: 0.7em;
+}
+
+/* Panels look like stack blocks: coloured top edge with the connector notch */
 .sheet {
-	background: var(--sheet);
-	border: 1px solid var(--rule);
+	position: relative;
+	background: var(--surface);
+	border: 1px solid var(--line);
+	border-top: 6px solid var(--tone, var(--motion));
 	border-radius: var(--radius);
 	box-shadow: var(--shadow);
+}
+
+.sheet::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 22px;
+	width: 44px;
+	height: 8px;
+	background: var(--tone, var(--motion));
+	clip-path: polygon(0 0, 100% 0, 78% 100%, 22% 100%);
+	pointer-events: none;
 }
 
 .label {
 	font-family: var(--font-mono);
 	font-size: 0.72rem;
+	font-weight: 500;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 	color: var(--ink-3);
 }
 
-/* scratchblocks' own stylesheet sets fonts; keep blocks crisp in dark mode too */
+/* scratchblocks' own stylesheet sets fonts; keep blocks crisp */
 .blocks-stage svg {
 	display: block;
 	max-width: none;

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img" aria-label="text2scratch – Text rein, Scratch-Blöcke raus">
+  <defs>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="1.4" fill="#1b1e33" fill-opacity="0.1"/>
+    </pattern>
+    <path id="stack" d="M0 4a4 4 0 0 1 4-4h12l8 8h16l8-8h148a4 4 0 0 1 4 4v56a4 4 0 0 1-4 4H48l-8 8H24l-8-8H4a4 4 0 0 1-4-4z"/>
+    <path id="hat" d="M0 20C20-6 100-6 120 20h96a4 4 0 0 1 4 4v40a4 4 0 0 1-4 4H48l-8 8H24l-8-8H4a4 4 0 0 1-4-4z"/>
+    <path id="cblock" d="M0 4a4 4 0 0 1 4-4h12l8 8h16l8-8h168a4 4 0 0 1 4 4v40a4 4 0 0 1-4 4H64l-8 8H40l-8-8H20a4 4 0 0 0-4 4v56a4 4 0 0 0 4 4h196a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H48l-8 8H24l-8-8H4a4 4 0 0 1-4-4z"/>
+    <path id="bool" d="M24 0h152l24 24-24 24H24L0 24z"/>
+    <clipPath id="frame"><rect width="1200" height="360" rx="24"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1200" height="360" fill="#f3f5fb"/>
+    <rect width="1200" height="360" fill="url(#dots)"/>
+
+    <!-- loose shapes -->
+    <g opacity="0.22">
+      <rect x="-60" y="22" width="220" height="48" rx="24" fill="#59c059" transform="rotate(12 50 46)"/>
+      <use href="#bool" x="40" y="300" fill="none" stroke="#59c059" stroke-width="4" transform="rotate(-10 140 324)"/>
+      <circle cx="610" cy="48" r="26" fill="#ff8c1a"/>
+      <rect x="700" y="290" width="170" height="44" rx="22" fill="none" stroke="#9966ff" stroke-width="4" transform="rotate(-4 785 312)"/>
+      <circle cx="1150" cy="320" r="18" fill="none" stroke="#ff6680" stroke-width="4"/>
+    </g>
+
+    <!-- ghost script, snapped together -->
+    <g opacity="0.3" transform="translate(975 40) rotate(-8) scale(1.05)">
+      <use href="#hat" fill="#ffbf00" stroke="#cc9900" stroke-width="2"/>
+      <use href="#stack" y="68" fill="#4c97ff" stroke="#3373cc" stroke-width="2"/>
+      <use href="#cblock" y="132" fill="#ffab19" stroke="#cf8b17" stroke-width="2"/>
+      <use href="#stack" x="16" y="180" fill="#9966ff" stroke="#774dcb" stroke-width="2"/>
+    </g>
+
+    <!-- wordmark: "scratch" is a stack block snapping onto "text" -->
+    <g font-family="'Bricolage Grotesque', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="800">
+      <text x="80" y="200" font-size="124" fill="#1b1e33" textLength="232" lengthAdjust="spacingAndGlyphs">text</text>
+      <g transform="translate(330 86)">
+        <path d="M0 10a10 10 0 0 1 10-10h18l12 14h44l12-14h354a10 10 0 0 1 10 10v118a10 10 0 0 1-10 10H10a10 10 0 0 1-10-10z" fill="#4c97ff"/>
+        <path d="M0 126h460v2a10 10 0 0 1-10 10H10a10 10 0 0 1-10-10z" fill="#3373cc"/>
+        <text x="32" y="114" font-size="124" fill="#14172a" textLength="396" lengthAdjust="spacingAndGlyphs">scratch</text>
+      </g>
+    </g>
+
+    <g font-family="'Helvetica Neue', Helvetica, Arial, sans-serif">
+      <text x="82" y="276" font-size="30" font-weight="600" fill="#4b5170">Text rein, Scratch-Blöcke raus.</text>
+      <text x="82" y="312" font-size="21" fill="#676e8d">Für Arbeitsblätter, Klausuren und Folien – direkt im Browser.</text>
+    </g>
+  </g>
+</svg>
