@@ -31,10 +31,13 @@
       <use href="#stack" x="16" y="180" fill="#9966ff" stroke="#774dcb" stroke-width="2"/>
     </g>
 
-    <!-- wordmark: "scratch" is a stack block snapping onto "text" -->
+    <!-- wordmark: text · 2 · "scratch" as a stack block -->
     <g font-family="'Bricolage Grotesque', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="800">
       <text x="80" y="200" font-size="124" fill="#1b1e33" textLength="232" lengthAdjust="spacingAndGlyphs">text</text>
-      <g transform="translate(330 86)">
+      <!-- "2" in a round number slot -->
+      <rect x="326" y="114" width="80" height="80" rx="40" fill="#fff" stroke="#dce0ec" stroke-width="4"/>
+      <text x="366" y="178" font-size="68" fill="#1b1e33" text-anchor="middle">2</text>
+      <g transform="translate(420 86)">
         <path d="M0 10a10 10 0 0 1 10-10h18l12 14h44l12-14h354a10 10 0 0 1 10 10v118a10 10 0 0 1-10 10H10a10 10 0 0 1-10-10z" fill="#4c97ff"/>
         <path d="M0 126h460v2a10 10 0 0 1-10 10H10a10 10 0 0 1-10-10z" fill="#3373cc"/>
         <text x="32" y="114" font-size="124" fill="#14172a" textLength="396" lengthAdjust="spacingAndGlyphs">scratch</text>

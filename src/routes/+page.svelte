@@ -2,6 +2,8 @@
 	import Editor from '#lib/components/Editor.svelte';
 	import DocxFlow from '#lib/components/DocxFlow.svelte';
 	import { i18n } from '#lib/i18n.svelte.ts';
+	// version shown in the footer always matches the installed package
+	import { version as sbVersion } from 'scratchblocks/package.json';
 
 	type Tab = 'editor' | 'word';
 	const tabs: { id: Tab; tone: string; label: 'tabEditor' | 'tabWord' }[] = [
@@ -32,8 +34,7 @@
 	<header class="top">
 		<div class="brand">
 			<h1>
-				<span class="w-text">text</span><span class="sr">2</span><span class="w-block" aria-hidden="true">scratch</span
-				><span class="sr">scratch</span>
+				<span class="w-text">text</span><span class="w-two">2</span><span class="w-block">scratch</span>
 			</h1>
 			<p class="tagline">{t.tagline}</p>
 		</div>
@@ -78,7 +79,7 @@
 
 	<footer class="foot">
 		<span>{t.footer}</span>
-		<span class="label">scratchblocks 3.6.4 · JSZip</span>
+		<span class="label">scratchblocks {sbVersion} · JSZip</span>
 	</footer>
 </div>
 
@@ -93,14 +94,6 @@
 		flex-direction: column;
 		gap: 24px;
 		min-height: 100vh;
-	}
-	.sr {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
 	}
 	.top {
 		display: flex;
@@ -123,6 +116,18 @@
 		margin: 0;
 	}
 	/* "scratch" set as a stack block snapping onto "text" */
+	/* "2" sits in a round number slot, like a reporter input */
+	.w-two {
+		margin-left: 0.1em;
+		padding: 0.06em 0.34em 0.1em;
+		font-size: 0.62em;
+		line-height: 1.1;
+		letter-spacing: 0;
+		background: var(--surface);
+		border: 0.05em solid var(--line);
+		border-radius: 999px;
+		box-shadow: inset 0 -0.08em 0 var(--line);
+	}
 	.w-block {
 		margin-left: 0.12em;
 		padding: 0.02em 0.3em 0.1em;
