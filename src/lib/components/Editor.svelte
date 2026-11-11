@@ -3,6 +3,7 @@
 	import { examples } from '#lib/examples.ts';
 	import { i18n } from '#lib/i18n.svelte.ts';
 	import { download, toPng, toSvgString, type Rendered } from '#lib/scratch.ts';
+	import { scatter, svgToPng } from '#lib/scatter.ts';
 
 	let code = $state(examples[0].code);
 	let debounced = $state(examples[0].code);
@@ -11,6 +12,20 @@
 	let copied = $state(false);
 	let helpOpen = $state(false);
 	let gutter: HTMLDivElement;
+
+	// scatter mode: loose blocks at random positions, like lost puzzle pieces
+	let scattered = $state(false);
+	let detach = $state(true);
+	let seed = $state(Date.now());
+	const puzzle = $derived.by(() => {
+		if (!scattered || !debounced.trim()) return null;
+		try {
+			return scatter(debounced, i18n.lang, { detachInputs: detach, seed });
+		} catch {
+			return null;
+		}
+	});
+	const canExport = $derived(scattered ? !!puzzle : !!rendered);
 
 	const t = $derived(i18n.t);
 	const lineCount = $derived(code.split('\n').length);
@@ -36,19 +51,27 @@
 		requestAnimationFrame(() => ta.setSelectionRange(s + 3, s + 3));
 	}
 
+	function svgString() {
+		if (scattered) return puzzle?.svg ?? '';
+		return rendered ? toSvgString(rendered) : '';
+	}
+
 	async function copySvg() {
-		if (!rendered) return;
-		await navigator.clipboard.writeText(toSvgString(rendered));
+		if (!canExport) return;
+		await navigator.clipboard.writeText(svgString());
 		copied = true;
 		setTimeout(() => (copied = false), 1400);
 	}
 
+	const filename = $derived(scattered ? 'scratch-puzzle' : 'scratch-blocks');
+
 	function dlSvg() {
-		if (rendered) download(toSvgString(rendered), 'scratch-blocks.svg', 'image/svg+xml');
+		if (canExport) download(svgString(), `${filename}.svg`, 'image/svg+xml');
 	}
 
 	async function dlPng() {
-		if (rendered) download(await toPng(rendered, 3 / zoom), 'scratch-blocks.png', 'image/png');
+		if (scattered && puzzle) download(await svgToPng(puzzle.svg, puzzle.width, puzzle.height, 3), `${filename}.png`, 'image/png');
+		else if (rendered) download(await toPng(rendered, 3 / zoom), `${filename}.png`, 'image/png');
 	}
 </script>
 
@@ -100,16 +123,35 @@
 					<span class="label">{Math.round(zoom * 100)}%</span>
 					<input type="range" min="0.75" max="2" step="0.25" bind:value={zoom} aria-label="Zoom" />
 				</label>
-				<button class="btn" onclick={copySvg} disabled={!rendered}>{copied ? `✓ ${t.copied}` : t.copySvg}</button>
-				<button class="btn" onclick={dlSvg} disabled={!rendered}>↓ {t.dlSvg}</button>
-				<button class="btn primary" onclick={dlPng} disabled={!rendered}>↓ {t.dlPng}</button>
+				<button class="btn" onclick={copySvg} disabled={!canExport}>{copied ? `✓ ${t.copied}` : t.copySvg}</button>
+				<button class="btn" onclick={dlSvg} disabled={!canExport}>↓ {t.dlSvg}</button>
+				<button class="btn primary" onclick={dlPng} disabled={!canExport}>↓ {t.dlPng}</button>
 			</div>
 		</header>
+		<div class="modebar">
+			<div class="seg" role="group" aria-label={t.mode}>
+				<button class:on={!scattered} aria-pressed={!scattered} onclick={() => (scattered = false)}>{t.modeScript}</button>
+				<button class:on={scattered} aria-pressed={scattered} onclick={() => (scattered = true)}>{t.modeScatter}</button>
+			</div>
+			{#if scattered}
+				<label class="opt"><input type="checkbox" bind:checked={detach} /> {t.detach}</label>
+				<button class="btn" onclick={() => (seed = Date.now())} disabled={!puzzle}>⟳ {t.shuffle}</button>
+				{#if puzzle}<span class="label">{t.pieces(puzzle.pieces)}</span>{/if}
+			{/if}
+		</div>
 		<div class="stage">
 			{#if !debounced.trim()}
 				<p class="empty">{t.empty}</p>
 			{/if}
-			<BlockPreview code={debounced} lang={i18n.lang} {zoom} bind:rendered />
+			<!-- stays mounted so warnings and the normal export keep working -->
+			<div hidden={scattered}>
+				<BlockPreview code={debounced} lang={i18n.lang} {zoom} bind:rendered />
+			</div>
+			{#if scattered && puzzle}
+				<div class="puzzle" style="width: {puzzle.width * zoom}px">
+					{@html puzzle.svg}
+				</div>
+			{/if}
 		</div>
 		{#if rendered?.warnings.length}
 			<div class="warn">
@@ -224,6 +266,30 @@
 		margin-top: 4px;
 	}
 
+	.modebar {
+		display: flex;
+		align-items: center;
+		gap: 10px 14px;
+		flex-wrap: wrap;
+		padding: 10px 14px 10px 18px;
+		border-bottom: 1px solid var(--line);
+		font-size: 0.875rem;
+	}
+	.opt {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: var(--ink-2);
+		font-weight: 500;
+	}
+	.opt input {
+		accent-color: var(--operators-edge);
+	}
+	.puzzle :global(svg) {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
 	.stage {
 		flex: 1;
 		overflow: auto;

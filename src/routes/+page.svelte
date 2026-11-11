@@ -148,31 +148,6 @@
 		align-items: center;
 		gap: 10px;
 	}
-	/* reporter-shaped segmented control */
-	.seg {
-		display: flex;
-		border: 1px solid var(--line);
-		border-radius: 999px;
-		background: var(--surface);
-		padding: 3px;
-		box-shadow: inset 0 -2px 0 var(--line);
-	}
-	.seg button {
-		border: 0;
-		background: none;
-		padding: 0.3em 0.95em;
-		border-radius: 999px;
-		font-family: var(--font-mono);
-		font-size: 0.8rem;
-		font-weight: 500;
-		color: var(--ink-3);
-	}
-	.seg button.on {
-		background: var(--operators);
-		color: var(--on-tone);
-		box-shadow: inset 0 -2px 0 var(--operators-edge);
-	}
-
 	/* hat-block tabs: dome on the left of the top edge */
 	.tabs {
 		display: flex;

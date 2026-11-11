@@ -11,7 +11,7 @@ export interface Rendered {
 
 let sb: any = null;
 
-function lib() {
+export function lib() {
 	if (!sb) {
 		sb = init(window);
 		sb.loadLanguages({ de });
